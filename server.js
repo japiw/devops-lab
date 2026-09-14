@@ -7,7 +7,7 @@ const server = http.createServer((req, res) => {
 
   res.end(
     JSON.stringify({
-      message: "Hello from DevOps Lab!",
+      message: "Hello from my Docker container",
       status: "running",
     })
   );
