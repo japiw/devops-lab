@@ -2,6 +2,7 @@ services:
   app:
     build: .
     container_name: devops-lab-app
+    restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
