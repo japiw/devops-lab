@@ -43,4 +43,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/japiw/devops-lab:latest
+          tags:
+            ghcr.io/japiw/devops-lab:latest
+            ghcr.io/japiw/devops-lab:${{ github.sha }}
