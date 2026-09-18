@@ -5,31 +5,64 @@ const server = spawn("node", ["server.js"], {
   env: {
     ...process.env,
     PORT: "3001",
+    DB_HOST: "localhost",
+    DB_PORT: "5432",
+    POSTGRES_USER: "devops",
+    POSTGRES_PASSWORD: "devops123",
+    POSTGRES_DB: "devops_lab",
   },
 });
 
-setTimeout(() => {
-  http.get("http://localhost:3001/health", (res) => {
-    let data = "";
+function request(path) {
+  return new Promise((resolve, reject) => {
+    http.get(`http://localhost:3001${path}`, (res) => {
+      let data = "";
 
-    res.on("data", (chunk) => {
-      data += chunk;
-    });
+      res.on("data", (chunk) => {
+        data += chunk;
+      });
 
-    res.on("end", () => {
-      if (res.statusCode === 200 && data === '{"status":"ok"}') {
-        console.log("Health check test passed.");
-        server.kill("SIGTERM");
-        process.exit(0);
-      }
+      res.on("end", () => {
+        resolve({
+          statusCode: res.statusCode,
+          data,
+        });
+      });
+    }).on("error", reject);
+  });
+}
 
-      console.error("Health check test failed.");
-      server.kill("SIGTERM");
-      process.exit(1);
-    });
-  }).on("error", (error) => {
-    console.error("Health check test failed:", error.message);
+async function runTests() {
+  try {
+    const health = await request("/health");
+
+    if (health.statusCode !== 200 || health.data !== '{"status":"ok"}') {
+      throw new Error("Health check test failed.");
+    }
+
+    console.log("Health check test passed.");
+
+    const db = await request("/db");
+
+    if (db.statusCode !== 200) {
+      throw new Error("Database connection test failed.");
+    }
+
+    const result = JSON.parse(db.data);
+
+    if (result.status !== "database connected") {
+      throw new Error("Database connection test failed.");
+    }
+
+    console.log("Database connection test passed.");
+
+    server.kill("SIGTERM");
+    process.exit(0);
+  } catch (error) {
+    console.error(error.message);
     server.kill("SIGTERM");
     process.exit(1);
-  });
-}, 1000);
+  }
+}
+
+setTimeout(runTests, 1000);
