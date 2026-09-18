@@ -1,7 +1,7 @@
 const http = require("http");
 const { Pool } = require("pg");
 
-const PORT = 3000;
+const PORT = Number(process.env.PORT || 3000);
 
 const pool = new Pool({
   host: process.env.DB_HOST || "database",
