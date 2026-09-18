@@ -65,6 +65,15 @@ server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
 
+process.on("SIGTERM", async () => {
+  console.log("SIGTERM received. Shutting down...");
+
+  server.close(async () => {
+    await pool.end();
+    console.log("Server shut down gracefully.");
+    process.exit(0);
+  });
+});
 
 
 
