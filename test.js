@@ -5,11 +5,11 @@ const server = spawn("node", ["server.js"], {
   env: {
     ...process.env,
     PORT: "3001",
-    DB_HOST: "localhost",
-    DB_PORT: "5432",
-    POSTGRES_USER: "devops",
-    POSTGRES_PASSWORD: "devops123",
-    POSTGRES_DB: "devops_lab",
+    DB_HOST: process.env.DB_HOST || "localhost",
+    DB_PORT: process.env.DB_PORT || "5432",
+    POSTGRES_USER: process.env.POSTGRES_USER || "devops",
+    POSTGRES_PASSWORD: process.env.POSTGRES_PASSWORD || "devops123",
+    POSTGRES_DB: process.env.POSTGRES_DB || "devops_lab",
   },
 });
 
